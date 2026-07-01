@@ -17,36 +17,29 @@ To run the WARP client in Docker, just write the following content to `docker-co
 
 ```yaml
 version: "3"
-
 services:
-  warp:
-    image: caomingjun/warp
-    container_name: warp
+  cloudflare-warp:
+    image: a15355447898a/warp-docker:latest
+    container_name: cloudflare-warp
     restart: always
-    # add removed rule back (https://github.com/opencontainers/runc/pull/3468)
     device_cgroup_rules:
       - 'c 10:200 rwm'
     ports:
       - "1080:1080"
     environment:
-      - WARP_SLEEP=2
-      # - WARP_LICENSE_KEY= # optional
-      # - WARP_ENABLE_NAT=1 # enable nat
+      - WARP_SLEEP=15
     cap_add:
-      # Docker already have them, these are for podman users
       - MKNOD
       - AUDIT_WRITE
-      # additional required cap for warp, both for podman and docker
       - NET_ADMIN
+      - SYS_PTRACE
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv4.conf.all.src_valid_mark=1
-      # uncomment for nat
-      # - net.ipv4.ip_forward=1
-      # - net.ipv6.conf.all.forwarding=1
-      # - net.ipv6.conf.all.accept_ra=2
     volumes:
       - ./data:/var/lib/cloudflare-warp
+    healthcheck:
+      disable: true
 ```
 
 Try it out to see if it works:
